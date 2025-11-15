@@ -1,7 +1,7 @@
 
 namespace NotesApi.Data;
 using Microsoft.EntityFrameworkCore;
-public class NotesDbContext(DbContextOptions<NotesDbContext> options) : DbContext
+public class NotesDbContext(DbContextOptions<NotesDbContext> options) : DbContext(options)
 {
 
     public DbSet<Note> Notes { get; set; }

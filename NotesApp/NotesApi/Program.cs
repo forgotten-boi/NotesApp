@@ -14,7 +14,7 @@ builder.Services.AddDbContext<NotesApi.Data.NotesDbContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("notes-database")));
 
 
-    builder.EnrichNpgsqlDbContext<NotesDbContext>();
+builder.EnrichNpgsqlDbContext<NotesDbContext>();
 
 builder.Services.AddOpenApi();
 
@@ -26,6 +26,12 @@ app.MapDefaultEndpoints();
 if (app.Environment.IsDevelopment())
 {
     app.MapOpenApi();
+
+    using var scope = app.Services.CreateScope();
+
+    var dbContext = scope.ServiceProvider.GetRequiredService<NotesDbContext>();
+    dbContext.Database.Migrate();
+
 }
 
 app.UseHttpsRedirection();
