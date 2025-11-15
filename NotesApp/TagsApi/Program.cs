@@ -8,7 +8,7 @@ builder.AddServiceDefaults();
 
 var app = builder.Build();
 
-app.MapDefaultEndPoints();
+app.MapDefaultEndpoints();
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
