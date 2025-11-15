@@ -21,8 +21,10 @@ var tagsApi = builder.AddProject<Projects.TagsApi>("tags-api")
 var notesApi = builder.AddProject<Projects.NotesApi>("notes-api")
     .WithHttpsEndpoint(5002, name: "Notes API")
     .WithReference(notesDatabase)
+    .WithReference(tagsApi)
     .WithReference(redis)
     .WaitFor(notesDatabase)
-    .WaitFor(redis);
+    .WaitFor(redis)
+    .WaitFor(tagsApi);
 
 builder.Build().Run();
