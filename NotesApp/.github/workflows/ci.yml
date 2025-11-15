@@ -1,0 +1,77 @@
+name: CI
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch:
+    inputs:
+      apply-migrations:
+        description: 'If true, run database update against local Postgres service'
+        required: false
+        default: 'false'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:15
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres" --health-interval 10s --health-timeout 5s --health-retries 5
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+
+      - name: Cache NuGet packages
+        uses: actions/cache@v4
+        with:
+          path: ~/.nuget/packages
+          key: ${{ runner.os }}-nuget-${{ hashFiles('**/*.csproj', '**/Directory.Packages.props') }}
+          restore-keys: |
+            ${{ runner.os }}-nuget-
+
+      - name: Restore
+        run: dotnet restore
+
+      - name: Build
+        run: dotnet build --configuration Release --no-restore
+
+      - name: Install dotnet-ef tool
+        run: |
+          dotnet tool install --global dotnet-ef --version 10.* || true
+          echo "##[add-path]$HOME/.dotnet/tools"
+        env:
+          DOTNET_NOLOGO: true
+
+      - name: List TagsApi migrations
+        run: dotnet ef migrations list --project TagsApi/TagsApi.csproj || true
+
+      - name: List NotesApi migrations
+        run: dotnet ef migrations list --project NotesApi/NotesApi.csproj || true
+
+      - name: Optional - Apply migrations (if requested)
+        if: ${{ github.event.inputs['apply-migrations'] == 'true' || github.event_name == 'workflow_dispatch' && github.event.inputs['apply-migrations'] == 'true' }}
+        env:
+          DOTNET_NOLOGO: true
+          PGHOST: localhost
+          PGUSER: postgres
+          PGPASSWORD: postgres
+        run: |
+          export PATH="$PATH:$HOME/.dotnet/tools"
+          # Wait for postgres to be ready
+          for i in {1..30}; do pg_isready -h localhost -p 5432 -U postgres && break || sleep 2; done
+          dotnet ef database update --project TagsApi/TagsApi.csproj --connection "Host=localhost;Database=tags;Username=postgres;Password=postgres"
+          dotnet ef database update --project NotesApi/NotesApi.csproj --connection "Host=localhost;Database=notes;Username=postgres;Password=postgres"
