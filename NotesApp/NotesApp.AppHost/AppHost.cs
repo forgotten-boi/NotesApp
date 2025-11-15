@@ -2,8 +2,11 @@ var builder = DistributedApplication.CreateBuilder(args);
 
 var postgres = builder.AddPostgres("postgres")
     .WithHostPort(5432)
+    .WithEnvironment("POSTGRES_USER", "postgres")
+    .WithEnvironment("POSTGRES_PASSWORD", "postgres")
     .WithDataVolume("notesapp-postgres-data")
     .WithLifetime(ContainerLifetime.Persistent);
+    // .WithDataVolume("notesapp-postgres-data")
 var redis = builder.AddRedis("redis")
     .WithHostPort(6379)
     .WithDataVolume("notesapp-redis-data")
