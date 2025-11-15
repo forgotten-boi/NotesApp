@@ -2,6 +2,8 @@
 
 This is boilerplate repository about implementing Microservices with Aspire 13 and .NET 10. It contains sample microservices and demonstrates several new .NET 10 features, as well as integrations, that can act as a solid starter for future projects.
 
+Note: Some of the sections of this README were generated with the help of AI tools and may contain errors.
+
 ## Projects
 - `NotesApi` - a REST service for notes.
 - `TagsApi` - a REST service for tags related to notes.
