@@ -67,6 +67,25 @@ dotnet run
 
 The apphost will wire up `tags-api` and `notes-api` and required dependencies.
 
+Local Postgres credentials
+--
+The AppHost creates a Postgres container for local development and will set default credentials for convenience: `POSTGRES_USER=postgres` and `POSTGRES_PASSWORD=postgres`.
+
+If you see errors such as "28P01: password authentication failed for user 'postgres'" in the logs, confirm the container has these environment variables set and that the applications are using the matching connection string. When running the host locally the `AppHost` will call into the Aspire hosting helper to create the database container and wire the credentials into the test databases.
+
+If you need a different password (for example, to connect with an existing Postgres instance), update the `NotesApp.AppHost/AppHost.cs` file and change the `WithEnvironment("POSTGRES_USER", "...")` and `WithEnvironment("POSTGRES_PASSWORD", "...")` values. Restart AppHost after making changes.
+
+Check the Postgres container logs to confirm startup:
+
+```pwsh
+docker ps
+docker logs <postgres-container-name>
+```
+
+Look for these lines in the logs to confirm healthy startup:
+- "database system is ready to accept connections" — indicates the DB started and is ready
+- If you see "password authentication failed" errors, your application is attempting to connect using different credentials than the container created.
+
 ## Quality & conventions
 - Central package management is enforced by `Directory.Packages.props` (`ManagePackageVersionsCentrally=true`). If you add a PackageReference in a project, omit the `Version` attribute unless you intend to override central versions.
 - EF Core version is pinned to avoid conflicts with transitive packages from the Aspire library.
