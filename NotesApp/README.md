@@ -86,16 +86,40 @@ Example connection strings (for each API when running via AppHost):
 NotesApi:
 
 ```
-Host=host.docker.internal;Port=5449;Database=notes-database;Username=notepostgres;Password=notepostgres
+Host=host.docker.internal;Port=5449;Database=notes-database;Username=postgres;Password=postgres
 ```
 
 TagsApi:
 
 ```
-Host=host.docker.internal;Port=5449;Database=tags-database;Username=notepostgres;Password=notepostgres
+Host=host.docker.internal;Port=5449;Database=tags-database;Username=postgres;Password=postgres
 ```
 
 Note: Aspire wiring will set the environment variables or configuration for the running APIs when you call `postgres.AddDatabase("notes-database")` and `postgres.AddDatabase("tags-database")`. The app code reads these as `builder.Configuration.GetConnectionString("notes-database")` or `GetConnectionString("tags-database")`.
+
+Resetting Postgres after changing credentials
+--
+If you change `POSTGRES_USER` or `POSTGRES_PASSWORD` in `AppHost.cs`, an existing Postgres data volume will still have credentials created at first-run. You must delete the old container and volume so the image can reinitialize the database with the new credentials:
+
+```pwsh
+# Stop and remove the running container (identify container id using `docker ps`)
+docker rm -f <postgres_container_id_or_name>
+
+# Remove the persisted volume used by AppHost (example name used here):
+docker volume rm notes-postgres-data
+
+# Start AppHost again
+cd NotesApp.AppHost
+dotnet run
+```
+
+This will recreate the Postgres cluster and create the new super user you configured. If you prefer to keep existing data, instead of removing the volume you can add the missing role manually:
+
+```pwsh
+# Replace names as needed - connect as the super user that currently exists
+docker exec -it <postgres_container_id> psql -U <current_user> -c "CREATE ROLE postgres WITH LOGIN PASSWORD 'postgres';"
+```
+
 
 Check the Postgres container logs to confirm startup:
 

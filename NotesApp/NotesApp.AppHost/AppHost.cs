@@ -1,15 +1,16 @@
 var builder = DistributedApplication.CreateBuilder(args);
 
-var postgres = builder.AddPostgres("postgres")
+var postgres = builder.AddPostgres("notepostgres")
     .WithHostPort(5449)
+    // Use the conventional 'postgres' superuser so tools (pgadmin, local scripts) can authenticate.
     .WithEnvironment("POSTGRES_USER", "postgres")
     .WithEnvironment("POSTGRES_PASSWORD", "postgres")
-    .WithDataVolume("notesapp-postgres-data")
+    .WithDataVolume("notes-postgres-data")
     .WithLifetime(ContainerLifetime.Persistent)
     ;
 
-var pgAdmin = builder.AddContainer("pgadmin", "dpage/pgadmin4:7.8")
-    .WithEndpoint(50500, name: "pgadmin-endpoint")
+var pgAdmin = builder.AddContainer("notepgadmin", "dpage/pgadmin4:7.8")
+    .WithEndpoint(5450, targetPort: 80, name: "pgadmin-endpoint")
     .WithEnvironment("PGADMIN_DEFAULT_EMAIL", "admin@example.com")
     .WithEnvironment("PGADMIN_DEFAULT_PASSWORD", "Admin123!")
     .WithLifetime(ContainerLifetime.Persistent)
@@ -22,8 +23,8 @@ var pgAdmin = builder.AddContainer("pgadmin", "dpage/pgadmin4:7.8")
 //     .WithDataVolume("notesapp-postgres-data")
 //     .WithLifetime(ContainerLifetime.Persistent);
     // .WithDataVolume("notesapp-postgres-data")
-var redis = builder.AddRedis("redis")
-    .WithHostPort(6379)
+var redis = builder.AddRedis("noteredis")
+    .WithHostPort(5451)
     .WithDataVolume("notesapp-redis-data")
     .WithLifetime(ContainerLifetime.Persistent);
 
