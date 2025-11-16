@@ -75,6 +75,28 @@ If you see errors such as "28P01: password authentication failed for user 'postg
 
 If you need a different password (for example, to connect with an existing Postgres instance), update the `NotesApp.AppHost/AppHost.cs` file and change the `WithEnvironment("POSTGRES_USER", "...")` and `WithEnvironment("POSTGRES_PASSWORD", "...")` values. Restart AppHost after making changes.
 
+Default ports and connection examples (AppHost)
+--
+- Postgres host port: 5449 (mapped in `AppHost.cs` by `.WithHostPort(5449)`). If you already run a local Postgres on 5432, AppHost will use 5449 by default to avoid conflict.
+- PGAdmin host port: 5450 (PGAdmin UI available at http://localhost:5450)
+- Redis host port: 5451
+
+Example connection strings (for each API when running via AppHost):
+
+NotesApi:
+
+```
+Host=host.docker.internal;Port=5449;Database=notes-database;Username=notepostgres;Password=notepostgres
+```
+
+TagsApi:
+
+```
+Host=host.docker.internal;Port=5449;Database=tags-database;Username=notepostgres;Password=notepostgres
+```
+
+Note: Aspire wiring will set the environment variables or configuration for the running APIs when you call `postgres.AddDatabase("notes-database")` and `postgres.AddDatabase("tags-database")`. The app code reads these as `builder.Configuration.GetConnectionString("notes-database")` or `GetConnectionString("tags-database")`.
+
 Check the Postgres container logs to confirm startup:
 
 ```pwsh
