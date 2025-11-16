@@ -7,6 +7,13 @@ var postgres = builder.AddPostgres("postgres")
     .WithDataVolume("notesapp-postgres-data")
     .WithLifetime(ContainerLifetime.Persistent)
     ;
+
+var pgAdmin = builder.AddContainer("pgadmin", "dpage/pgadmin4:7.8")
+    .WithEndpoint(50500, name: "pgadmin-endpoint")
+    .WithEnvironment("PGADMIN_DEFAULT_EMAIL", "admin@example.com")
+    .WithEnvironment("PGADMIN_DEFAULT_PASSWORD", "Admin123!")
+    .WithLifetime(ContainerLifetime.Persistent)
+    .WaitFor(postgres);
 // var postgres = builder.AddPostgres("postgres")
 //     .WithHostPort(5449)
 //     .WithUserName("postgres")
