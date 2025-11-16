@@ -1,11 +1,19 @@
 var builder = DistributedApplication.CreateBuilder(args);
 
 var postgres = builder.AddPostgres("postgres")
-    .WithHostPort(5432)
+    .WithHostPort(5449)
     .WithEnvironment("POSTGRES_USER", "postgres")
     .WithEnvironment("POSTGRES_PASSWORD", "postgres")
     .WithDataVolume("notesapp-postgres-data")
-    .WithLifetime(ContainerLifetime.Persistent);
+    .WithLifetime(ContainerLifetime.Persistent)
+    ;
+// var postgres = builder.AddPostgres("postgres")
+//     .WithHostPort(5449)
+//     .WithUserName("postgres")
+//     .WithUsername("postgres")
+//     .WithPassword("SuperSecret123!")
+//     .WithDataVolume("notesapp-postgres-data")
+//     .WithLifetime(ContainerLifetime.Persistent);
     // .WithDataVolume("notesapp-postgres-data")
 var redis = builder.AddRedis("redis")
     .WithHostPort(6379)
