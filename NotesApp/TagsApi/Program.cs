@@ -1,5 +1,6 @@
 using TagsApi.Data;
 using Microsoft.EntityFrameworkCore;
+using TagsApi.Features.AnalyzeNote;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -16,6 +17,11 @@ builder.EnrichNpgsqlDbContext<TagsApi.Data.TagsDbContext>();
 
 var app = builder.Build();
 
+// Log the effective connection string so we can confirm AppHost wiring for debugging.
+var loggerFactory = app.Services.GetRequiredService<Microsoft.Extensions.Logging.ILoggerFactory>();
+var startupLogger = loggerFactory.CreateLogger("Startup");
+startupLogger.LogInformation("tags-database connection string: {connection}", builder.Configuration.GetConnectionString("tags-database"));
+
 app.MapDefaultEndpoints();
 
 // Configure the HTTP request pipeline.
@@ -28,6 +34,8 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+
+app.MapPost("tags/analyze", AnalyzeNoteEndpoint.AnalyzeNote);
 
 
 app.Run();

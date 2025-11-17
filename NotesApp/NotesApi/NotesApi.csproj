@@ -18,6 +18,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\NotesApp.ServiceDefaults\NotesApp.ServiceDefaults.csproj" />
+    <ProjectReference Include="..\Notes.Shared\Notes.Shared.csproj" />
   </ItemGroup>
 
 </Project>
