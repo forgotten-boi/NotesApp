@@ -2,7 +2,13 @@
 
 This is boilerplate repository about implementing Microservices with Aspire 13 and .NET 10. It contains sample microservices and demonstrates several new .NET 10 features, as well as integrations, that can act as a solid starter for future projects.
 
-Note: Some of the sections of this README were generated with the help of AI tools and may contain errors.
+Note: Some of the sections of this README were generated with the help of AI tools. Boilerplate is not yet ready.
+
+## Next Upcoming Work
+- Next I am going to integrate Kafka for communication between API, 
+- Clean Architecture with CQRS(Without Mediatr)
+- Radis Cache
+- Docker/Docker-Compose Implementations
 
 ## Projects
 - `NotesApi` - a REST service for notes.
